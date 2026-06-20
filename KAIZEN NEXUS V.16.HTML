@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAIZEN NEXUS // THE ANIME CORE ENGINE</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark-core: #030307;
+            --bg-surface-primary: #0a0a14;
+            --bg-surface-secondary: #121225;
+            --primary-amethyst: #9d4edd;
+            --secondary-neon-pink: #ff006e;
+            --accent-cyan: #00f3ff;
+            --accent-gold: #ffb700;
+            --text-main: #ffffff;
+            --text-muted: #8a99ad;
+            --glass-bg: rgba(10, 10, 20, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --fx-speed: 0.4s;
+            --easing-curve: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark-core);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- PRE-RENDERED GLOWING SCROLLBAR --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark-core);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-surface-secondary);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-amethyst);
+            box-shadow: 0 0 15px var(--primary-amethyst);
+        }
+
+        /* Ambient Dynamic Light Gradients */
+        .ambient-glow-core {
+            position: fixed;
+            top: -25%;
+            left: -25%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at 30% 30%, rgba(157, 78, 221, 0.06), transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(255, 0, 110, 0.05), transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+            animation: coreRotation 30s linear infinite;
+        }
+
+        @keyframes coreRotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Glassmorphism Presets */
+        .cyber-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .text-gradient-neon {
+            background: linear-gradient(135deg, var(--primary-amethyst), var(--secondary-neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ==========================================================================
+           CINEMATIC GLITCH PORTAL GATE INTRO
+           ========================================================================== */
+        #portal-shutter {
+            position: fixed;
+            inset: 0;
+            background-color: #010103;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: transform 1.2s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+
+        .shutter-grid-overlay {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                linear-gradient(rgba(157, 78, 221, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(157, 78, 221, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: rotate(-15deg);
+            animation: gridDrive 20s linear infinite;
+        }
+
+        @keyframes gridDrive {
+            from { transform: rotate(-15deg) translateY(0); }
+            to { transform: rotate(-15deg) translateY(50px); }
+        }
+
+        .portal-header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 10%, var(--primary-amethyst) 50%, var(--secondary-neon-pink) 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .portal-trigger-node {
+            background: transparent;
+            border: 2px solid var(--primary-amethyst);
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            padding: 20px 50px;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            transition: var(--fx-speed) var(--easing-curve);
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.2);
+        }
+
+        .portal-trigger-node:hover {
+            background: linear-gradient(135deg, var(--primary-amethyst), var(--secondary-neon-pink));
+            border-color: transparent;
+            box-shadow: 0 0 45px var(--primary-amethyst);
+            transform: scale(1.05);
+        }
+
+        /* ==========================================================================
+           3D STRUCTURAL ANIME CARD COMPONENT
+           ========================================================================== */
+        .nexus-anime-card {
+            background: var(--bg-surface-primary);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+        }
+
+        .nexus-anime-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-amethyst);
+            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.12);
+        }
+
+        .card-image-lens {
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 2 / 3;
+        }
+
+        .card-image-lens img {
+            transition: transform 0.8s ease;
+        }
+
+        .nexus-anime-card:hover .card-image-lens img {
+            transform: scale(1.08) rotate(1deg);
+        }
+
+        /* Shimmer Loading Skeleton Framework */
+        .neon-skeleton {
+            background: linear-gradient(90deg, #0a0a14 25%, #18182c 50%, #0a0a14 75%);
+            background-size: 200% 100%;
+            animation: assetShimmer 1.6s infinite linear;
+        }
+
+        @keyframes assetShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ==========================================================================
+           ADVANCED MULTI-THREAT LIGHTBOX THEATER OVERLAY
+           ========================================================================== */
+        #theatre-portal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 3, 7, 0.96);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        #theatre-portal-overlay.portal-active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .theatre-viewport-container {
+            background: var(--bg-surface-primary);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            width: 100%;
+            max-width: 1300px;
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            box-shadow: 0 0 100px rgba(157, 78, 221, 0.15);
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #theatre-portal-overlay.portal-active .theatre-viewport-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .theatre-video-box {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000000;
+        }
+
+        .theatre-video-box iframe, .theatre-video-box .no-trailer-fallback {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .theatre-metadata-box {
+            padding: 45px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        @media (max-width: 1024px) {
+            .theatre-viewport-container { grid-template-columns: 1fr; max-height: 85vh; overflow-y: auto; }
+            .theatre-metadata-box { max-height: none; padding: 25px; }
+            #theatre-portal-overlay { padding: 15px; }
+        }
+    </style>
+</head>
+<body class="antialiased relative">
+
+    <div class="ambient-glow-core"></div>
+
+    <div id="portal-shutter">
+        <div class="shutter-grid-overlay"></div>
+        <div class="relative z-10 flex flex-col items-center p-6">
+            <div class="font-bold text-[var(--accent-cyan)] tracking-[8px] text-xs mb-4 uppercase font-['Orbitron']">API Connection Sync Stable</div>
+            <h1 class="portal-header-title">KAIZEN NEXUS<br>AUTOMATED CORE</h1>
+            <button class="portal-trigger-node" onclick="breakPortalSeal()">Initialize Interface</button>
+        </div>
+    </div>
+
+    <nav class="fixed w-full top-0 z-50 cyber-glass border-b border-zinc-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="restoreHomeMatrix()">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--primary-amethyst)] to-[var(--secondary-neon-pink)] flex items-center justify-center shadow-[0_0_20px_rgba(157,78,221,0.4)] group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-circle-nodes text-xl text-white"></i>
+                    </div>
+                    <span class="text-xl font-['Orbitron'] font-black tracking-widest text-white">
+                        KAIZEN<span class="text-gradient-neon">NEXUS</span>
+                    </span>
+                </div>
+
+                <div class="flex-1 max-w-lg ml-10 hidden md:block">
+                    <form id="search-terminal-form" class="relative group" onsubmit="handleSearchExecution(event)">
+                        <i class="fa-solid fa-terminal absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 group-focus-within:text-[var(--primary-amethyst)] text-sm transition-colors"></i>
+                        <input 
+                            type="text" 
+                            id="nexus-search-input"
+                            class="w-full bg-[#07070f] border border-zinc-800 text-white rounded-none py-3 pl-11 pr-4 focus:outline-none focus:border-[var(--primary-amethyst)] focus:ring-1 focus:ring-[var(--primary-amethyst)] transition-all text-sm placeholder-zinc-600"
+                            placeholder="Query global live database engine..."
+                            autocomplete="off"
+                        >
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-20 min-h-screen">
+        
+        <section id="billboard-hero" class="relative w-full h-[60vh] min-h-[480px] flex items-center hidden overflow-hidden border-b border-zinc-900">
+            <div id="hero-lens-bg" class="absolute inset-0 z-0"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-dark-core)] via-black/40 to-transparent z-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[var(--bg-dark-core)] via-[var(--bg-dark-core)]/80 to-transparent z-10"></div>
+
+            <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="max-w-3xl" id="hero-payload-content">
+                    </div>
+            </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            
+            <div class="md:hidden mb-6">
+                <form id="search-terminal-form-mobile" class="relative group" onsubmit="handleSearchExecution(event)">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
+                    <input 
+                        type="text" 
+                        id="nexus-search-input-mobile"
+                        class="w-full bg-[#07070f] border border-zinc-800 text-white rounded-none py-3.5 pl-11 pr-4 focus:outline-none focus:border-[var(--primary-amethyst)]"
+                        placeholder="Search anime database..."
+                        autocomplete="off"
+                    >
+                </form>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 border-b border-zinc-900 pb-5">
+                <h2 id="matrix-panel-title" class="text-xl font-['Orbitron'] font-bold tracking-wider flex items-center gap-3 uppercase">
+                    <i class="fa-solid fa-chart-line text-[var(--secondary-neon-pink)] animate-pulse"></i> 
+                    Trending Live Stream
+                </h2>
+
+                <div class="flex flex-wrap gap-2 font-['Orbitron'] text-xs font-bold tracking-wider">
+                    <button id="filter-node-ALL" class="px-4 py-2 bg-zinc-900 border border-zinc-800 text-white hover:border-[var(--primary-amethyst)] transition-colors" onclick="shiftActiveFilter('ALL')">
+                        ALL MODULES
+                    </button>
+                    <button id="filter-node-NEW" class="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-[var(--primary-amethyst)] transition-colors" onclick="shiftActiveFilter('NEW')">
+                        MODERN (2020+)
+                    </button>
+                    <button id="filter-node-OLD" class="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-[var(--primary-amethyst)] transition-colors" onclick="shiftActiveFilter('OLD')">
+                        LEGEND CORE
+                    </button>
+                    <button id="filter-node-WATCHLIST" class="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-[var(--primary-amethyst)] transition-colors flex items-center gap-2" onclick="shiftActiveFilter('WATCHLIST')">
+                        WATCHLIST (<span id="watchlist-total-counter" class="text-[var(--accent-cyan)]">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <div id="hardware-status-panel" class="hidden w-full text-center py-16 cyber-glass border-zinc-800 text-zinc-400 rounded-none tracking-wide text-sm"></div>
+
+            <div id="matrix-hardware-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                </div>
+        </section>
+    </main>
+
+    <div id="theatre-portal-overlay" onclick="evaluateTheatreOutsideClick(event)">
+        <div class="theatre-viewport-container relative">
+            
+            <button onclick="terminateTheatrePortal()" class="absolute -top-12 right-0 sm:top-4 sm:right-4 z-50 w-10 h-10 rounded-none bg-black/60 border border-zinc-800 flex items-center justify-center text-white hover:bg-[var(--secondary-neon-pink)] hover:rotate-90 transition-all duration-300">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="w-full h-full relative shrink-0">
+                <div class="theatre-video-box h-full">
+                    <iframe id="theatre-video-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <div id="theatre-video-fallback" class="no-trailer-fallback hidden flex flex-col items-center justify-center bg-zinc-950 p-6 text-center">
+                        <i class="fa-solid fa-triangle-exclamation text-3xl text-[var(--accent-gold)] mb-3"></i>
+                        <span class="font-['Orbitron'] font-bold text-sm tracking-widest text-zinc-300">TRAILER LINK ABSENT</span>
+                        <span class="text-xs text-zinc-600 mt-1">Streaming parameters restrict live pipeline sync</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full bg-[#06060c] p-6 sm:p-9 border-t lg:border-t-0 lg:border-l border-zinc-900/80 flex flex-col theatre-metadata-box">
+                <div id="modal-genres-matrix" class="flex flex-wrap gap-1.5 mb-4">
+                    </div>
+
+                <h2 id="modal-node-title" class="text-2xl sm:text-3xl font-['Orbitron'] font-black text-white mb-1 leading-tight uppercase">---</h2>
+                <h3 id="modal-node-title-jp" class="text-xs text-zinc-500 font-medium tracking-wider mb-5">---</h3>
+
+                <div class="grid grid-cols-3 gap-2 mb-6 border border-zinc-900 p-3 bg-black/40 text-center">
+                    <div class="flex flex-col items-center py-1">
+                        <i class="fa-solid fa-star text-[var(--accent-gold)] text-sm mb-1"></i>
+                        <span id="modal-node-score" class="text-sm font-bold text-white">--</span>
+                        <span class="text-[9px] text-zinc-500 uppercase font-['Orbitron'] tracking-wider mt-0.5">Score Spec</span>
+                    </div>
+                    <div class="flex flex-col items-center py-1 border-x border-zinc-900">
+                        <i class="fa-solid fa-trophy text-[var(--accent-cyan)] text-sm mb-1"></i>
+                        <span id="modal-node-rank" class="text-sm font-bold text-white">--</span>
+                        <0span class="text-[9px] text-zinc-500 uppercase font-['Orbitron'] tracking-wider mt-0.5">Rank Global</span>
+                    </div>
+                    <div class="flex flex-col items-center py-1">
+                        <i class="fa-solid fa-clapperboard text-[var(--primary-amethyst)] text-sm mb-1"></i>
+                        <span id="modal-node-episodes" class="text-sm font-bold text-white">--</span>
+                        <span class="text-[9px] text-zinc-500 uppercase font-['Orbitron'] tracking-wider mt-0.5">Data Tracks</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3 flex-1">
+                    <h4 class="text-xs font-['Orbitron'] tracking-widest text-[var(--primary-amethyst)] font-bold flex items-center gap-2 uppercase">
+                        <i class="fa-solid fa-file-lines"></i> Narrative Core Log Summary
+                    </h4>
+                    <p id="modal-node-synopsis" class="text-zinc-400 leading-relaxed text-xs sm:text-sm max-h-40 overflow-y-auto pr-2"></p>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-2 gap-4 text-xs border-t border-zinc-900 pt-5">
+                    <div>
+                        <span class="text-zinc-600 block font-['Orbitron'] text-[10px] tracking-wider uppercase mb-0.5">Status Flag</span>
+                        <span id="modal-node-status" class="font-semibold text-zinc-300">--</span>
+                    </div>
+                    <div>
+                        <span class="text-zinc-600 block font-['Orbitron'] text-[10px] tracking-wider uppercase mb-0.5">Creative Studio</span>
+                        <span id="modal-node-studio" class="font-semibold text-zinc-300">--</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_ROOT = 'https://api.jikan.moe/v4';
+        
+        // Target Layout Node Objects
+        const gridContainerNode = document.getElementById('matrix-hardware-grid');
+        const heroSectionPanel = document.getElementById('billboard-hero');
+        const masterPanelTitleText = document.getElementById('matrix-panel-title');
+        const internalStatusMsgPanel = document.getElementById('hardware-status-panel');
+        
+        // Global System Virtual Memory Storage Arrays
+        let runtimeActiveDataset = [];
+        let systemActiveFilterKey = 'ALL';
+        let userLocalWatchlistMemory = JSON.parse(localStorage.getItem('nexusWatchlistCache')) || [];
+
+        // Application Lifecyle Core Boot Loop
+        document.addEventListener('DOMContentLoaded', () => {
+            synchronizeWatchlistCounterTelemetry();
+            
+            // Register hardware keyboard exception hooks
+            document.addEventListener('keydown', (event) => {
+                if(event.key === 'Escape') terminateTheatrePortal();
+            });
+        });
+
+        // Break Intro Shutter Gate Matrix
+        function breakPortalSeal() {
+            document.getElementById('portal-shutter').style.transform = 'translateY(-100%)';
+            fetchTrendingDatasetMatrix();
+        }
+
+        // Restore Platform Navigation Matrix States
+        function restoreHomeMatrix() {
+            document.getElementById('nexus-search-input').value = '';
+            document.getElementById('nexus-search-input-mobile').value = '';
+            systemActiveFilterKey = 'ALL';
+            updateFilterInterfaceNodeHighlights();
+            masterPanelTitleText.innerHTML = `<i class="fa-solid fa-chart-line text-[var(--secondary-neon-pink)] animate-pulse"></i> Trending Live Stream`;
+            heroSectionPanel.classList.remove('hidden');
+            fetchTrendingDatasetMatrix();
+        }
+
+        // Fetch Trending Data Modules From Live API
+        async function fetchTrendingDatasetMatrix() {
+            hideSystemStatusNotification();
+            injectLoadingSkeletonsPlaceholders(24);
+            
+            try {
+                const response = await fetch(`${API_BASE_ROOT}/top/anime?limit=24`);
+                if (!response.ok) throw new Error('API Response Pipeline Throttled');
+                const parsedPayload = await response.json();
+                runtimeActiveDataset = parsedPayload.data;
+                
+                if (runtimeActiveDataset.length > 0) {
+                    executeHeroDynamicInjection(runtimeActiveDataset[0]);
+                    executeUIGridAssembly(runtimeActiveDataset);
+                }
+            } catch (error) {
+                displaySystemStatusNotification('<i class="fa-solid fa-circle-exclamation text-xl mb-2 text-red-500 block"></i> API data network connection failure. Core limits exceeded. Please refresh page terminal.');
+                gridContainerNode.innerHTML = '';
+            }
+        }
+
+        // Handle Search Inputs Pipeline Form Submissions
+        function handleSearchExecution(event) {
+            event.preventDefault();
+            const primaryQueryString = document.getElementById('nexus-search-input').value.trim();
+            const mobileQueryString = document.getElementById('nexus-search-input-mobile').value.trim();
+            const finalizedQuery = primaryQueryString || mobileQueryString;
+            
+            if (finalizedQuery) {
+                executeDatabaseSearchQuery(finalizedQuery);
+            } else {
+                restoreHomeMatrix();
+            }
+        }
+
+        // Query Database Engine Process
+        async function executeDatabaseSearchQuery(queryString) {
+            heroSectionPanel.classList.add('hidden'); // Terminate hero panel clarity for search layout
+            masterPanelTitleText.innerHTML = `<i class="fa-solid fa-terminal text-[var(--primary-amethyst)]"></i> Query Result Index For: "<span class="text-white">${queryString}</span>"`;
+            hideSystemStatusNotification();
+            injectLoadingSkeletonsPlaceholders(18);
+
+            try {
+                const response = await fetch(`${API_BASE_ROOT}/anime?q=${encodeURIComponent(queryString)}&limit=24&sfw=true`);
+                if (!response.ok) throw new Error('Query Protocol Faulted');
+                const parsedPayload = await response.json();
+                runtimeActiveDataset = parsedPayload.data;
+                
+                if (runtimeActiveDataset.length === 0) {
+                    displaySystemStatusNotification(`<i class="fa-solid fa-radiation text-xl mb-2 text-[var(--accent-gold)] block"></i> Zero matched matrix points discovered for query context: "${queryString}"`);
+                    gridContainerNode.innerHTML = '';
+                } else {
+                    executeUIGridAssembly(runtimeActiveDataset);
+                }
+            } catch (error) {
+                displaySystemStatusNotification('<i class="fa-solid fa-triangle-exclamation text-xl mb-2 text-red-400 block"></i> Live search route interrupted by external server node.');
+                gridContainerNode.innerHTML = '';
+            }
+        }
+
+        // Render Dynamic Billboard Hero Header System
+        function executeHeroDynamicInjection(animeNode) {
+            const heroBgNode = document.getElementById('hero-lens-bg');
+            const heroContentPayloadNode = document.getElementById('hero-payload-content');
+            
+            const dynamicImgSource = animeNode.trailer?.images?.maximum_image_url || animeNode.images.webp.large_image_url;
+            heroBgNode.innerHTML = `<img src="${dynamicImgSource}" alt="background-lens" class="w-full h-full object-cover filter blur-[8px] scale-105 brightness-[0.35]">`;
+            
+            const configurationTitle = animeNode.title_english || animeNode.title;
+            const truncatedSynopsisText = animeNode.synopsis ? animeNode.synopsis.substring(0, 240) + '...' : 'No narrative specs logged in core archives.';
+            
+            heroContentPayloadNode.innerHTML = `
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-black/60 border border-[var(--primary-amethyst)] text-[var(--primary-amethyst)] text-[10px] font-['Orbitron'] font-black uppercase tracking-widest mb-5">
+                    <i class="fa-solid fa-bolt text-[var(--accent-gold)]"></i> CRITICAL RUNTIME TOP SPOTLIGHT
+                </div>
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-['Orbitron'] font-black text-white leading-tight drop-shadow-2xl mb-4 uppercase">
+                    ${configurationTitle}
+                </h1>
+                <p class="text-zinc-400 text-sm sm:text-base leading-relaxed drop-shadow-md mb-6 max-w-2xl">
+                    ${truncatedSynopsisText}
+                </p>
+                <div class="flex flex-wrap items-center gap-4">
+                    <button onclick="launchTheatrePortalById(${animeNode.mal_id})" class="flex items-center gap-2.5 bg-gradient-to-r from-[var(--primary-amethyst)] to-[var(--secondary-neon-pink)] px-6 py-3.5 font-['Orbitron'] font-extrabold text-xs tracking-wider text-white hover:scale-102 transition-all shadow-[0_0_25px_rgba(157,78,221,0.35)] uppercase">
+                        <i class="fa-solid fa-play text-xs"></i> Engage System Core
+                    </button>
+                    <div class="flex items-center gap-2 px-4 py-3 bg-black/40 border border-zinc-800 text-[var(--accent-gold)] font-['Orbitron'] font-bold text-sm">
+                        <i class="fa-solid fa-star"></i> ${animeNode.score || 'N/A'}
+                    </div>
+                </div>
+            `;
+            heroSectionPanel.classList.remove('hidden');
+        }
+
+        // Execute Grid Card UI Component Build Engine Loop
+        function executeUIGridAssembly(dataCollection) {
+            gridContainerNode.innerHTML = '';
+            
+            // Filter dynamic dataset mapping paths inside memory matrices
+            let workingDataSet = [...dataCollection];
+            
+            if (systemActiveFilterKey === 'NEW') {
+                workingDataSet = workingDataSet.filter(anime => {
+                    const releaseYear = anime.year || (anime.aired && anime.aired.prop.from.year);
+                    return releaseYear >= 2020;
+                });
+            } else if (systemActiveFilterKey === 'OLD') {
+                workingDataSet = workingDataSet.filter(anime => {
+                    const releaseYear = anime.year || (anime.aired && anime.aired.prop.from.year);
+                    return releaseYear && releaseYear < 2020;
+                });
+            } else if (systemActiveFilterKey === 'WATCHLIST') {
+                workingDataSet = userLocalWatchlistMemory;
+            }
+
+            if (workingDataSet.length === 0) {
+                displaySystemStatusNotification(`<i class="fa-solid fa-folder-open text-lg mb-1 block"></i> No indexed modules match current target segment filters.`);
+                return;
+            } else {
+                hideSystemStatusNotification();
+            }
+
+            workingDataSet.forEach(anime => {
+                const standardizedTitle = anime.title_english || anime.title;
+                const posterGraphicSource = anime.images.webp.large_image_url;
+                const evaluatedScoreMetric = anime.score || '0.0';
+                const compilationReleaseYear = anime.year || (anime.aired && anime.aired.prop.from.year) || 'N/A';
+                const broadcastTypeClassification = anime.type || 'TV';
+                const isItemSavedInLocalWatchlist = userLocalWatchlistMemory.some(savedItem => savedItem.mal_id === anime.mal_id);
+
+                const layoutNodeCardElement = document.createElement('div');
+                layoutNodeCardElement.className = 'nexus-anime-card flex flex-col group';
+                
+                layoutNodeCardElement.innerHTML = `
+                    <div class="card-image-lens w-full bg-zinc-950 cursor-pointer" onclick="launchTheatrePortalById(${anime.mal_id})">
+                        <img src="${posterGraphicSource}" alt="${standardizedTitle}" loading="lazy" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-md px-2 py-0.5 border border-zinc-800 text-[10px] font-['Orbitron'] font-bold text-[var(--accent-gold)] z-10 flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[9px]"></i> ${evaluatedScoreMetric}
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 flex flex-col flex-1 bg-[#05050b] border-t border-zinc-950">
+                        <h3 class="text-white font-['Orbitron'] font-bold text-xs sm:text-sm line-clamp-2 min-h-[40px] leading-snug mb-3 group-hover:text-[var(--primary-amethyst)] transition-colors uppercase cursor-pointer" onclick="launchTheatrePortalById(${anime.mal_id})">
+                            ${standardizedTitle}
+                        </h3>
+                        <div class="flex items-center justify-between mt-auto gap-2 text-[10px] text-zinc-500 font-medium">
+                            <div class="flex items-center gap-1.5">
+                                <span class="bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-zinc-300 font-bold">${broadcastTypeClassification}</span>
+                                <span>•</span>
+                                <span>${compilationReleaseYear}</span>
+                            </div>
+                            <button class="w-7 h-7 flex items-center justify-center border ${isItemSavedInLocalWatchlist ? 'bg-[var(--secondary-neon-pink)] border-transparent text-white' : 'border-zinc-800 text-zinc-400 hover:text-[var(--secondary-neon-pink)] hover:border-[var(--secondary-neon-pink)]'} transition-colors" onclick="toggleWatchlistObjectNode(event, ${JSON.stringify(anime).replace(/"/g, '&quot;')}, this)">
+                                <i class="fa-solid ${isItemSavedInLocalWatchlist ? 'fa-bookmark' : 'fa-plus'} text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                gridContainerNode.appendChild(layoutNodeCardElement);
+            });
+        }
+
+        // Shift System Filtering Telemetry Keys
+        function shiftActiveFilter(filterKeyTarget) {
+            systemActiveFilterKey = filterKeyTarget;
+            updateFilterInterfaceNodeHighlights();
+            
+            // Re-trigger view assemblies
+            if(systemActiveFilterKey === 'WATCHLIST') {
+                heroSectionPanel.classList.add('hidden');
+                masterPanelTitleText.innerHTML = `<i class="fa-solid fa-bookmark text-[var(--secondary-neon-pink)]"></i> Client-Side Watchlist Archives`;
+                executeUIGridAssembly([]);
+            } else {
+                if (runtimeActiveDataset.length > 0 && document.getElementById('nexus-search-input').value === '') {
+                    heroSectionPanel.classList.remove('hidden');
+                    masterPanelTitleText.innerHTML = `<i class="fa-solid fa-chart-line text-[var(--secondary-neon-pink)] animate-pulse"></i> Trending Live Stream`;
+                }
+                executeUIGridAssembly(runtimeActiveDataset);
+            }
+        }
+
+        // Refresh UI Class Highlights for Filter Buttons
+        function updateFilterInterfaceNodeHighlights() {
+            const keysList = ['ALL', 'NEW', 'OLD', 'WATCHLIST'];
+            keysList.forEach(key => {
+                const targetNode = document.getElementById(`filter-node-${key}`);
+                if(key === systemActiveFilterKey) {
+                    targetNode.classList.remove('text-zinc-400', 'bg-zinc-900', 'border-zinc-800');
+                    targetNode.classList.add('text-white', 'bg-zinc-950', 'border-[var(--primary-amethyst)]');
+                } else {
+                    targetNode.classList.remove('text-white', 'bg-zinc-950', 'border-[var(--primary-amethyst)]');
+                    targetNode.classList.add('text-zinc-400', 'bg-zinc-900', 'border-zinc-800');
+                }
+            });
+        }
+
+        // Mutate Watchlist Local Data Objects Array Storage
+        function toggleWatchlistObjectNode(event, animeObject, buttonHTMLElement) {
+            event.stopPropagation(); // Avoid triggering card modal actions
+            
+            const existingElementIndex = userLocalWatchlistMemory.findIndex(storedItem => storedItem.mal_id === animeObject.mal_id);
+            
+            if (existingElementIndex > -1) {
+                // Object exists inside memory loop -> splice removal target
+                userLocalWatchlistMemory.splice(existingElementIndex, 1);
+                buttonHTMLElement.classList.remove('bg-[var(--secondary-neon-pink)]', 'border-transparent', 'text-white');
+                buttonHTMLElement.classList.add('border-zinc-800', 'text-zinc-400');
+                buttonHTMLElement.innerHTML = `<i class="fa-solid fa-plus text-xs"></i>`;
+            } else {
+                // Object missing -> push execution parameters inside storage node arrays
+                userLocalWatchlistMemory.push(animeObject);
+                buttonHTMLElement.classList.remove('border-zinc-800', 'text-zinc-400');
+                buttonHTMLElement.classList.add('bg-[var(--secondary-neon-pink)]', 'border-transparent', 'text-white');
+                buttonHTMLElement.innerHTML = `<i class="fa-solid fa-bookmark text-xs"></i>`;
+            }
+
+            localStorage.setItem('nexusWatchlistCache', JSON.stringify(userLocalWatchlistMemory));
+            synchronizeWatchlistCounterTelemetry();
+
+            if (systemActiveFilterKey === 'WATCHLIST') {
+                executeUIGridAssembly([]);
+            }
+        }
+
+        function synchronizeWatchlistCounterTelemetry() {
+            document.getElementById('watchlist-total-counter').innerText = userLocalWatchlistMemory.length;
+        }
+
+        // Deep-Dive Modal View Engine Construction
+        function launchTheatrePortalById(malId) {
+            // Check active pool runtime dataset or scan local watchlist backup indices
+            let matchedDataNode = runtimeActiveDataset.find(item => item.mal_id === malId);
+            if (!matchedDataNode) {
+                matchedDataNode = userLocalWatchlistMemory.find(item => item.mal_id === malId);
+            }
+            if (!matchedDataNode) return;
+
+            // Map and parse layout variables
+            document.getElementById('modal-node-title').textContent = matchedDataNode.title_english || matchedDataNode.title;
+            document.getElementById('modal-node-title-jp').textContent = matchedDataNode.title_japanese || '';
+            document.getElementById('modal-node-score').textContent = matchedDataNode.score || '0.0';
+            document.getElementById('modal-node-rank').textContent = matchedDataNode.rank ? `#${matchedDataNode.rank}` : 'N/A';
+            document.getElementById('modal-node-episodes').textContent = matchedDataNode.episodes || '?';
+            document.getElementById('modal-node-synopsis').textContent = matchedDataNode.synopsis || 'No analytical data logged for target asset parameter.';
+            document.getElementById('modal-node-status').textContent = matchedDataNode.status || 'Unknown Status';
+            document.getElementById('modal-node-studio').textContent = matchedDataNode.studios?.map(st => st.name).join(', ') || 'Independent Core Studio';
+
+            // Extract dynamic metadata genre tags
+            const genreHostNode = document.getElementById('modal-genres-matrix');
+            genreHostNode.innerHTML = matchedDataNode.genres?.map(gn => 
+                `<span class="px-2.5 py-0.5 text-[9px] font-bold font-['Orbitron'] tracking-wider bg-zinc-900 border border-zinc-800 text-[var(--accent-cyan)] uppercase">${gn.name}</span>`
+            ).join('') || '';
+
+            // Map and resolve inline video player pipeline channels
+            const videoIframeTarget = document.getElementById('theatre-video-iframe');
+            const fallbackGraphicView = document.getElementById('theatre-video-fallback');
+
+            if (matchedDataNode.trailer && matchedDataNode.trailer.youtube_id) {
+                fallbackGraphicView.classList.add('hidden');
+                videoIframeTarget.classList.remove('hidden');
+                videoIframeTarget.src = `https://www.youtube.com/embed/${matchedDataNode.trailer.youtube_id}?autoplay=1&rel=0&modestbranding=1`;
+            } else {
+                videoIframeTarget.classList.add('hidden');
+                videoIframeTarget.src = "";
+                fallbackGraphicView.classList.remove('hidden');
+            }
+
+            // Launch active overlay viewport transitions
+            document.getElementById('theatre-portal-overlay').classList.add('portal-active');
+            document.body.style.overflow = 'hidden'; // Restrict backdrop scrolling bleedovers
+        }
+
+        function terminateTheatrePortal() {
+            document.getElementById('theatre-portal-overlay').classList.remove('portal-active');
+            document.body.style.overflow = ''; 
+            document.getElementById('theatre-video-iframe').src = ""; // Clear active media buffer
+        }
+
+        function evaluateTheatreOutsideClick(event) {
+            if (event.target.id === 'theatre-portal-overlay') {
+                terminateTheatrePortal();
+            }
+        }
+
+        // Output Structural Asset Skeletons During Active Network Fetches
+        function injectLoadingSkeletonsPlaceholders(amountCount) {
+            gridContainerNode.innerHTML = '';
+            for(let loop = 0; loop < amountCount; loop++) {
+                const structuralSkeletonElement = document.createElement('div');
+                structuralSkeletonElement.className = 'border border-zinc-900 bg-zinc-950 aspect-[2/3] relative neon-skeleton flex flex-col justify-end p-4 gap-2';
+                structuralSkeletonElement.innerHTML = `
+                    <div class="h-3 w-5/6 bg-zinc-800/60 rounded-none"></div>
+                    <div class="h-2 w-1/2 bg-zinc-800/40 rounded-none"></div>
+                `;
+                gridContainerNode.appendChild(structuralSkeletonElement);
+            }
+        }
+
+        function displaySystemStatusNotification(messageString) {
+            internalStatusMsgPanel.innerHTML = messageString;
+            internalStatusMsgPanel.classList.remove('hidden');
+        }
+
+        function hideSystemStatusNotification() {
+            internalStatusMsgPanel.classList.add('hidden');
+        }
+    </script>
+<!-- ==========================================================================
+       FOOTER / CREDIT SECTION 
+       ========================================================================== -->
+    <footer class="w-full border-t border-zinc-900 bg-[#05050b] py-8 mt-12 text-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="font-['Orbitron'] text-xs sm:text-sm tracking-widest text-zinc-400 uppercase">
+                Website developed by <span class="text-gradient-neon font-black">Suraj Siyag</span>
+            </p>
+            <p class="text-zinc-600 text-[11px] sm:text-xs mt-2 max-w-md mx-auto leading-relaxed">
+                Want a custom website built for your project? Contact me at 
+                <a href="mailto:surajsiyag96@gmail.com" class="text-[var(--accent-cyan)] hover:underline font-medium">surajsiyag96@gmail.com</a>. 
+                Development pricing ranges from <span class="text-[var(--accent-gold)] font-bold">₹1000 to ₹7000</span>—pay whatever cost you like within that budget range!
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
